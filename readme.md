@@ -721,37 +721,10 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ## 👥 Authors
 
-- **Your Name** - [GitHub](https://github.com/yourusername)
+- **Lokik Ganeriwal** - [GitHub](https://github.com/lokikg)
+- **Arjit Mathur** - [GitHub](https://github.com/arjitMathur)
 
-## 🙏 Acknowledgments
 
-- [FastAPI](https://fastapi.tiangolo.com/) - Modern Python web framework
-- [React](https://reactjs.org/) - UI library
-- [Neon](https://neon.tech/) - Serverless PostgreSQL
-- [HiveMQ](https://www.hivemq.com/) - MQTT broker
-- [Grafana](https://grafana.com/) - Monitoring and visualization
-- [shadcn/ui](https://ui.shadcn.com/) - Beautiful UI components
-- [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
-
-## 📞 Support
-
-For issues, questions, or suggestions:
-- **Issues**: [GitHub Issues](https://github.com/yourusername/smart-city-iot-platform/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/smart-city-iot-platform/discussions)
-- **Email**: your.email@example.com
-
-## 🗺️ Roadmap
-
-- [ ] Add user authentication and authorization
-- [ ] Implement real-time WebSocket updates
-- [ ] Add more sensor types (humidity sensors, radiation sensors)
-- [ ] Machine learning for predictive analytics
-- [ ] Mobile application (React Native)
-- [ ] Multi-city support with city switching
-- [ ] Advanced alert rules engine
-- [ ] Export functionality (PDF reports, CSV exports)
-- [ ] Multi-language support (i18n)
-- [ ] Dark mode toggle
 
 ---
 
