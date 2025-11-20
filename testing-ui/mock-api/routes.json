@@ -1,0 +1,5 @@
+{
+  "/api/test-scenarios": "/test-scenarios",
+  "/api/test-scenarios/:id": "/test-scenarios/:id",
+  "/api/test-scenarios/:id/run": "/test-scenarios/:id"
+}

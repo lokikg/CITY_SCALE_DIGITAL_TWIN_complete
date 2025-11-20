@@ -1,0 +1,130 @@
+@startuml
+title City-Scale Digital Twin: Deployment Architecture
+
+skinparam {
+  FontSize 12
+  FontName Arial
+}
+
+skinparam node {
+    BackgroundColor #BBDEFB
+    BorderColor #1565C0
+    FontColor #0D47A1
+    BorderThickness 2
+}
+
+skinparam artifact {
+    BackgroundColor #C8E6C9
+    BorderColor #2E7D32
+    FontColor #1B5E20
+}
+
+skinparam database {
+    BackgroundColor #FFCCBC
+    BorderColor #D84315
+    FontColor #BF360C
+    BorderThickness 2
+}
+
+skinparam component {
+    BackgroundColor #F8BBD0
+    BorderColor #C2185B
+    FontColor #880E4F
+}
+
+skinparam cloud {
+    BackgroundColor #E0F2F1
+    BorderColor #00695C
+    FontColor #004D40
+}
+
+' IoT Sources
+node "IoT Environment" as IoT_Node {
+  artifact "Sensors / Simulator\nData Generator" as DataGen
+}
+
+' Cloud Deployment - Render
+node "Render (Backend Host)" as Render_Node {
+  component "FastAPI Backend\nWeb Service" as Backend
+  component "Data Simulator\nWorker Service" as Simulator
+  component "Test Runner\nAPI Endpoint" as TestRunner
+  note top of Backend
+    Python 3.x, Uvicorn
+    Async CRUD Operations
+  end note
+  note top of Simulator
+    Background Task
+    Updates every 30s
+  end note
+}
+
+' Cloud Deployment - Vercel
+node "Vercel (Frontend Host)" as Vercel_Node {
+  component "React Frontend App" as Frontend
+  note top of Frontend
+    Node.js Runtime
+    Deployed from Git
+    Environment-based API URLs
+  end note
+}
+
+' Messaging Service
+cloud "HiveMQ Cloud\n(MQTT Broker)" as MQTT_Cloud {
+  component "MQTT Topics\n(Real-time Data)" as MQTT
+  note top of MQTT
+    Managed Cloud Service
+    TLS/SSL Secured
+  end note
+}
+
+' Database
+database "Neon PostgreSQL\n(Serverless Database)" as Neon_DB {
+  component "PostgreSQL Database\n(12 Sensor Tables)" as DB
+  note top of Neon_DB
+    Serverless Postgres
+    Auto-scaling
+    Connection Pooling
+  end note
+}
+
+' Monitoring & Analytics
+node "Grafana (Analytics)" as Grafana_Node {
+  component "Grafana Dashboards\n(Visualization)" as Grafana
+  note top of Grafana_Node
+    Docker Container
+    Self-hosted on Render
+    Real-time Visualization
+  end note
+}
+
+' Deployment Relationships & Data Flow
+DataGen -->|MQTT (TLS/SSL)| MQTT : Publish Sensor Data
+
+Simulator -->|MQTT (TLS/SSL)| MQTT : Publish Simulated Data
+MQTT -->|Subscribe| Backend : Real-time Ingestion
+
+Backend -->|asyncpg (TCP/IP)| DB : Read/Write Sensor Data
+Backend -->|REST API (HTTPS)| Frontend : Serve Data & Config
+
+Simulator -->|asyncpg (TCP/IP)| DB : Write Simulated Data
+
+Grafana -->|SQL Queries| DB : Fetch Metrics & Data
+Frontend -->|Query Data| Grafana : View Dashboards
+Frontend -->|REST API| Backend : CRUD Operations
+
+TestRunner -->|REST API| Backend : Test Execution
+TestRunner -->|Result Queries| DB : Store Test Results
+
+note bottom
+  Production Deployment:
+  - Frontend: Vercel (global CDN)
+  - Backend: Render (serverless functions)
+  - Database: Neon (serverless PostgreSQL)
+  - Messaging: HiveMQ Cloud (managed MQTT)
+  - Monitoring: Grafana on Render (Docker)
+  
+  All services use secure TLS/SSL connections
+  Environment variables manage sensitive configs
+end note
+
+@enduml

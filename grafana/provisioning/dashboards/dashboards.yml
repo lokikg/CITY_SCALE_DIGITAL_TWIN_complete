@@ -1,0 +1,13 @@
+apiVersion: 1
+
+providers:
+  - name: 'city-digital-twin'
+    orgId: 1
+    folder: 'City Digital Twin'
+    folderUid: 'city-digital-twin'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards

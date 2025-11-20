@@ -1,0 +1,640 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+const APITesting = () => {
+  const [apiUrl, setApiUrl] = useState('');
+  const [endpoints, setEndpoints] = useState([]);
+  const [method, setMethod] = useState('GET');
+  const [requestBody, setRequestBody] = useState('');
+  const [response, setResponse] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [testResults, setTestResults] = useState([]);
+  const [selectedEndpoint, setSelectedEndpoint] = useState('');
+  const [selectedDeviceType, setSelectedDeviceType] = useState('traffic_sensors');
+  
+  const deviceTypes = [
+    'traffic_sensors',
+    'air_quality_sensors',
+    'noise_sensors',
+    'weather_stations',
+    'smart_meters',
+    'waste_bins',
+    'parking_sensors',
+    'street_lights',
+    'public_transport_trackers',
+    'surveillance_cameras',
+    'water_quality_sensors',
+    'energy_grid_sensors'
+  ];
+  
+  // Predefined endpoints for each device type
+  useEffect(() => {
+    if (selectedDeviceType) {
+      setEndpoints([
+        `/api/${selectedDeviceType}/all`,
+        `/api/${selectedDeviceType}/latest`,
+        `/api/${selectedDeviceType}/add`,
+        `/api/${selectedDeviceType}/{id}`,
+      ]);
+      setSelectedEndpoint(`/api/${selectedDeviceType}/all`);
+    }
+  }, [selectedDeviceType]);
+  
+  // Sample data for each device type to use in POST requests
+  const getSampleData = () => {
+    const baseData = {
+      id: crypto.randomUUID(),
+      location: 'Test Location',
+      latitude: 37.7749,
+      longitude: -122.4194,
+      timestamp: new Date().toISOString()
+    };
+    
+    const deviceSpecificData = {
+      traffic_sensors: {
+        vehicle_count: Math.floor(Math.random() * 100),
+        avg_speed: Math.floor(Math.random() * 60) + 20
+      },
+      air_quality_sensors: {
+        pm25: Math.random() * 50,
+        pm10: Math.random() * 100,
+        no2: Math.random() * 40,
+        co: Math.random() * 10
+      },
+      noise_sensors: {
+        decibel_level: Math.random() * 100
+      },
+      weather_stations: {
+        temperature: Math.random() * 40 - 10,
+        humidity: Math.random() * 100,
+        rainfall: Math.random() * 50,
+        wind_speed: Math.random() * 30
+      },
+      smart_meters: {
+        electricity_usage: Math.random() * 500,
+        water_usage: Math.random() * 2000
+      },
+      waste_bins: {
+        fill_level: Math.random() * 100,
+        temperature: Math.random() * 40
+      },
+      parking_sensors: {
+        is_occupied: Math.random() > 0.5
+      },
+      street_lights: {
+        status: Math.random() > 0.5,
+        energy_consumption: Math.random() * 50
+      },
+      public_transport_trackers: {
+        bus_id: `BUS-${Math.floor(Math.random() * 1000)}`,
+        occupancy: Math.floor(Math.random() * 50)
+      },
+      surveillance_cameras: {
+        motion_detected: Math.random() > 0.5,
+        object_count: Math.floor(Math.random() * 20)
+      },
+      water_quality_sensors: {
+        ph: Math.random() * 14,
+        turbidity: Math.random() * 10,
+        dissolved_oxygen: Math.random() * 15
+      },
+      energy_grid_sensors: {
+        voltage: 220 + Math.random() * 20,
+        current: Math.random() * 50,
+        frequency: 50 + Math.random() * 2 - 1
+      }
+    };
+    
+    return { ...baseData, ...deviceSpecificData[selectedDeviceType] };
+  };
+  
+  // Update request body when method or endpoint changes
+  useEffect(() => {
+    if (method === 'POST' || method === 'PUT') {
+      setRequestBody(JSON.stringify(getSampleData(), null, 2));
+    } else {
+      setRequestBody('');
+    }
+  }, [method, selectedEndpoint, selectedDeviceType]);
+  
+  // Handle API URL change
+  const handleApiUrlChange = (e) => {
+    setApiUrl(e.target.value);
+  };
+  
+  // Handle method change
+  const handleMethodChange = (e) => {
+    setMethod(e.target.value);
+  };
+  
+  // Handle endpoint change
+  const handleEndpointChange = (e) => {
+    setSelectedEndpoint(e.target.value);
+  };
+  
+  // Handle device type change
+  const handleDeviceTypeChange = (e) => {
+    setSelectedDeviceType(e.target.value);
+  };
+  
+  // Handle request body change
+  const handleRequestBodyChange = (e) => {
+    setRequestBody(e.target.value);
+  };
+  
+  // Send API request
+  const sendRequest = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      let url = (apiUrl || 'http://localhost:8000') + selectedEndpoint;
+      
+      // Replace any {id} in the URL with a random UUID
+      if (url.includes('{id}')) {
+        // For simplicity, we'll use a UUID but in reality would be an actual ID from the system
+        url = url.replace('{id}', crypto.randomUUID());
+      }
+      
+      const config = {
+        method,
+        url,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      };
+      
+      if (method === 'POST' || method === 'PUT') {
+        config.data = JSON.parse(requestBody);
+      }
+      
+      const startTime = performance.now();
+      const result = await axios(config);
+      const endTime = performance.now();
+      
+      setResponse({
+        status: result.status,
+        statusText: result.statusText,
+        data: result.data,
+        headers: result.headers,
+        duration: Math.round(endTime - startTime)
+      });
+      
+      // Add to test results
+      setTestResults(prev => [
+        {
+          id: crypto.randomUUID(),
+          endpoint: selectedEndpoint,
+          method,
+          status: result.status,
+          duration: Math.round(endTime - startTime),
+          timestamp: new Date().toISOString(),
+          success: true
+        },
+        ...prev
+      ]);
+      
+    } catch (err) {
+      setError({
+        message: err.message,
+        details: err.response ? err.response.data : null
+      });
+      
+      // Add failed test to results
+      setTestResults(prev => [
+        {
+          id: crypto.randomUUID(),
+          endpoint: selectedEndpoint,
+          method,
+          status: err.response ? err.response.status : 'Error',
+          duration: 0,
+          timestamp: new Date().toISOString(),
+          success: false
+        },
+        ...prev
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Run a batch of tests for the current device type
+  const runBatchTests = async () => {
+    setLoading(true);
+    
+    try {
+      // Create a new device
+      const createData = getSampleData();
+      const baseUrl = apiUrl || 'http://localhost:8000';
+      
+      // Test 1: Create a new device
+      const createResult = await axios({
+        method: 'POST',
+        url: `${baseUrl}/api/${selectedDeviceType}/add`,
+        headers: { 'Content-Type': 'application/json' },
+        data: createData
+      });
+      
+      const newDeviceId = createResult.data.id;
+      
+      // Add to test results
+      setTestResults(prev => [
+        {
+          id: crypto.randomUUID(),
+          endpoint: `/api/${selectedDeviceType}/add`,
+          method: 'POST',
+          status: createResult.status,
+          duration: 0,
+          timestamp: new Date().toISOString(),
+          success: true
+        },
+        ...prev
+      ]);
+      
+      // Test 2: Get the created device
+      const getResult = await axios({
+        method: 'GET',
+        url: `${baseUrl}/api/${selectedDeviceType}/${newDeviceId}`,
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      setTestResults(prev => [
+        {
+          id: crypto.randomUUID(),
+          endpoint: `/api/${selectedDeviceType}/${newDeviceId}`,
+          method: 'GET',
+          status: getResult.status,
+          duration: 0,
+          timestamp: new Date().toISOString(),
+          success: true
+        },
+        ...prev
+      ]);
+      
+      // Test 3: Update the created device
+      const updateData = { ...getSampleData(), id: newDeviceId };
+      const updateResult = await axios({
+        method: 'PUT',
+        url: `${baseUrl}/api/${selectedDeviceType}/${newDeviceId}`,
+        headers: { 'Content-Type': 'application/json' },
+        data: updateData
+      });
+      
+      setTestResults(prev => [
+        {
+          id: crypto.randomUUID(),
+          endpoint: `/api/${selectedDeviceType}/${newDeviceId}`,
+          method: 'PUT',
+          status: updateResult.status,
+          duration: 0,
+          timestamp: new Date().toISOString(),
+          success: true
+        },
+        ...prev
+      ]);
+      
+      // Test 4: Get all devices
+      const getAllResult = await axios({
+        method: 'GET',
+        url: `${baseUrl}/api/${selectedDeviceType}/all`,
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      setTestResults(prev => [
+        {
+          id: crypto.randomUUID(),
+          endpoint: `/api/${selectedDeviceType}/all`,
+          method: 'GET',
+          status: getAllResult.status,
+          duration: 0,
+          timestamp: new Date().toISOString(),
+          success: true
+        },
+        ...prev
+      ]);
+      
+      // Test 5: Delete the created device
+      const deleteResult = await axios({
+        method: 'DELETE',
+        url: `${baseUrl}/api/${selectedDeviceType}/${newDeviceId}`,
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      setTestResults(prev => [
+        {
+          id: crypto.randomUUID(),
+          endpoint: `/api/${selectedDeviceType}/${newDeviceId}`,
+          method: 'DELETE',
+          status: deleteResult.status,
+          duration: 0,
+          timestamp: new Date().toISOString(),
+          success: true
+        },
+        ...prev
+      ]);
+      
+      // Set the last result as the current response
+      setResponse({
+        status: deleteResult.status,
+        statusText: deleteResult.statusText,
+        data: deleteResult.data,
+        headers: deleteResult.headers,
+        duration: 0
+      });
+      
+    } catch (err) {
+      setError({
+        message: err.message,
+        details: err.response ? err.response.data : null
+      });
+      
+      // Add failed test to results
+      setTestResults(prev => [
+        {
+          id: crypto.randomUUID(),
+          endpoint: 'Batch Test',
+          method: 'MULTIPLE',
+          status: err.response ? err.response.status : 'Error',
+          duration: 0,
+          timestamp: new Date().toISOString(),
+          success: false
+        },
+        ...prev
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // Clear test results
+  const clearTestResults = () => {
+    setTestResults([]);
+  };
+  
+  return (
+    <div className="container mx-auto px-4 py-6">
+      <h1 className="text-3xl font-bold text-gray-800 mb-6">API Testing</h1>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Request Builder */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Request Builder</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="api-url">
+                API Base URL (Default: http://localhost:8000)
+              </Label>
+              <Input
+                id="api-url"
+                type="text"
+                value={apiUrl}
+                onChange={handleApiUrlChange}
+                placeholder="http://localhost:8000"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="device-type">Device Type</Label>
+              <Select value={selectedDeviceType} onValueChange={setSelectedDeviceType}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select device type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {deviceTypes.map(type => (
+                    <SelectItem key={type} value={type}>
+                      {type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="method">Method</Label>
+                <Select value={method} onValueChange={setMethod}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select method" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="GET">GET</SelectItem>
+                    <SelectItem value="POST">POST</SelectItem>
+                    <SelectItem value="PUT">PUT</SelectItem>
+                    <SelectItem value="DELETE">DELETE</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <Label htmlFor="endpoint">Endpoint</Label>
+                <Select value={selectedEndpoint} onValueChange={setSelectedEndpoint}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select endpoint" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {endpoints.map(endpoint => (
+                      <SelectItem key={endpoint} value={endpoint}>
+                        {endpoint}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            {(method === 'POST' || method === 'PUT') && (
+              <div>
+                <Label htmlFor="request-body">Request Body</Label>
+                <Textarea
+                  id="request-body"
+                  rows={8}
+                  value={requestBody}
+                  onChange={handleRequestBodyChange}
+                  className="font-mono text-sm"
+                />
+              </div>
+            )}
+            
+            <div className="flex gap-3">
+              <Button
+                onClick={sendRequest}
+                disabled={loading}
+                variant="default"
+              >
+                {loading ? 'Sending...' : 'Send Request'}
+              </Button>
+            
+              <Button
+                onClick={runBatchTests}
+                disabled={loading}
+                variant="secondary"
+              >
+                Run CRUD Test Suite
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* Response Viewer */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Response</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {error && (
+              <Alert variant="destructive" className="mb-4">
+                <AlertDescription>
+                  <strong>Error:</strong> {error.message}
+                  {error.details && (
+                    <pre className="mt-2 text-xs bg-red-100 p-2 rounded overflow-auto">
+                      {JSON.stringify(error.details, null, 2)}
+                    </pre>
+                  )}
+                </AlertDescription>
+              </Alert>
+            )}
+              <p className="text-sm text-red-700">{error.message}</p>
+              {error.details && (
+                <pre className="mt-2 text-xs bg-red-100 p-2 rounded overflow-auto">
+                  {JSON.stringify(error.details, null, 2)}
+                </pre>
+              )}
+            </div>
+          )}
+          
+          {loading && (
+            <div className="flex justify-center items-center h-40">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          )}
+          
+          {!loading && response && !error && (
+            <div>
+              <div className="mb-4 flex justify-between items-center">
+                <div>
+                  <Badge variant={
+                    response.status >= 200 && response.status < 300
+                      ? 'success'
+                      : 'destructive'
+                  }>
+                    {response.status} {response.statusText}
+                  </Badge>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {response.duration}ms
+                </div>
+              </div>
+              
+              <div className="mb-4">
+                <h3 className="text-sm font-medium text-gray-700 mb-2">Response Headers</h3>
+                <pre className="bg-gray-50 p-3 rounded-md text-xs overflow-auto max-h-24">
+                  {JSON.stringify(response.headers, null, 2)}
+                </pre>
+              </div>
+              
+              <div>
+                <h3 className="text-sm font-medium text-gray-700 mb-2">Response Body</h3>
+                <pre className="bg-gray-50 p-3 rounded-md text-xs overflow-auto max-h-96">
+                  {JSON.stringify(response.data, null, 2)}
+                </pre>
+              </div>
+            </div>
+          )}
+          
+          {!loading && !response && !error && (
+            <div className="flex justify-center items-center h-40 text-gray-400">
+              No response yet. Send a request to see results.
+            </div>
+          )}
+        </div>
+      </div>
+      
+      {/* Test Results */}
+      <div className="mt-8 bg-white rounded-lg shadow-md p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold text-gray-700">Test Results</h2>
+          <button
+            onClick={clearTestResults}
+            className="text-sm text-gray-600 hover:text-gray-900"
+          >
+            Clear Results
+          </button>
+        </div>
+        
+        {testResults.length === 0 ? (
+          <div className="text-gray-400 text-center py-8">
+            No test results yet. Send requests to see results here.
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Endpoint
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Method
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Duration
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Timestamp
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Result
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {testResults.map(result => (
+                  <tr key={result.id}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {result.endpoint}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <span className={`px-2 py-1 text-xs font-medium rounded ${
+                        result.method === 'GET' ? 'bg-blue-100 text-blue-800' :
+                        result.method === 'POST' ? 'bg-green-100 text-green-800' :
+                        result.method === 'PUT' ? 'bg-yellow-100 text-yellow-800' :
+                        result.method === 'DELETE' ? 'bg-red-100 text-red-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {result.method}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {result.status}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {result.duration}ms
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {new Date(result.timestamp).toLocaleString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <span className={`px-2 py-1 text-xs font-medium rounded ${
+                        result.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      }`}>
+                        {result.success ? 'Success' : 'Failed'}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default APITesting;

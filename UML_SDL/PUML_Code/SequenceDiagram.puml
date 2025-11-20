@@ -1,0 +1,131 @@
+@startuml
+title City-Scale Digital Twin: Real-Time Data Flow Sequence Diagram
+
+skinparam actor {
+    BackgroundColor #FCE4EC
+    BorderColor #C2185B
+    FontColor #880E4F
+}
+
+skinparam participant {
+    BackgroundColor #E1F5FE
+    BorderColor #01579B
+    FontColor #01579B
+}
+
+skinparam database {
+    BackgroundColor #FFE0B2
+    BorderColor #E65100
+    FontColor #BF360C
+}
+
+skinparam sequence {
+    ArrowColor #0277BD
+    LifeLineBorderColor #0277BD
+    LifeLineBackgroundColor #B3E5FC
+    ParticipantBorderColor #0277BD
+    ParticipantBackgroundColor #B3E5FC
+    ParticipantFontColor #01579B
+}
+
+actor "City Manager" as User
+participant "React Frontend\n(Browser)" as Frontend
+participant "FastAPI Backend\n(Render)" as Backend
+participant "MQTT Subscriber" as MqttSub
+database "PostgreSQL DB\n(Neon)" as DB
+participant "HiveMQ MQTT Broker" as MQTT
+participant "Data Simulator" as Simulator
+
+== Initialization & Configuration ==
+User -> Frontend: Open Dashboard
+activate Frontend
+Frontend -> Backend: GET /api/config
+activate Backend
+Backend --> Frontend: Return config (API URL, sensor types)
+deactivate Backend
+deactivate Frontend
+
+== Real-Time Data Ingestion Loop (Background - Every 30s) ==
+note over Simulator, MQTT, Backend
+  This loop runs continuously in the background
+  independent of user interactions
+end note
+
+loop 30-Second Interval
+    Simulator ->> Simulator: Generate realistic\nsensor data
+    activate Simulator
+    Simulator ->> MQTT: MQTT Publish\n(topic: sensor/traffic, etc.)
+    deactivate Simulator
+    
+    activate MQTT
+    MqttSub ->> MQTT: Subscribe to\ntopic(s)
+    MQTT ->> MqttSub: Deliver message\n(sensor reading)
+    deactivate MQTT
+    
+    activate MqttSub
+    MqttSub ->> MqttSub: Validate data\n(Pydantic schema)
+    MqttSub ->> Backend: Async write\nto DB (ORM)
+    deactivate MqttSub
+    
+    activate Backend
+    Backend -> DB: INSERT/UPDATE\nsensor record
+    activate DB
+    DB --> Backend: Acknowledge
+    deactivate DB
+    deactivate Backend
+end
+
+== On-Demand Data Retrieval & Visualization ==
+User -> Frontend: Click on sensor\nor refresh
+activate Frontend
+Frontend ->> Backend: GET /api/traffic_sensors/latest\n(or other sensor type)
+activate Backend
+
+Backend ->> Backend: Query Database\nvia SQLAlchemy ORM
+Backend -> DB: SELECT * FROM traffic_sensors\nWHERE timestamp > now() - interval
+activate DB
+DB --> Backend: Return sensor records
+deactivate DB
+
+Backend ->> Backend: Format response\nto JSON (Pydantic schema)
+Backend --> Frontend: Return JSON data\n(array of sensors)
+deactivate Backend
+
+Frontend ->> Frontend: Parse JSON\nUpdate React state
+Frontend ->> Frontend: Render map\nwith new markers
+Frontend ->> Frontend: Update dashboard\ncharts & stats
+User <- Frontend: Display visualized\nreal-time data
+deactivate Frontend
+
+== User Interaction - Device Management ==
+User -> Frontend: Submit device\nCRUD command
+activate Frontend
+Frontend ->> Backend: POST /api/traffic_sensors\n(create/update)
+activate Backend
+Backend ->> Backend: Validate request\n(Pydantic)
+Backend -> DB: Insert/Update record
+activate DB
+DB --> Backend: Return new record
+deactivate DB
+Backend --> Frontend: Return 200 + record
+deactivate Backend
+Frontend ->> Frontend: Update UI\nwith confirmation
+deactivate Frontend
+
+== Testing & Monitoring ==
+note over Backend
+  Test runner API available
+  at /api/tests endpoint
+end note
+
+User -> Frontend: Trigger manual test
+activate Frontend
+Frontend ->> Backend: POST /api/tests/run_all
+activate Backend
+Backend ->> Backend: Execute test suite\n(pytest, custom tests)
+Backend --> Frontend: Return test results\n(pass/fail, metrics)
+deactivate Backend
+Frontend ->> Frontend: Display results\nin Testing UI
+deactivate Frontend
+
+@enduml

@@ -1,0 +1,164 @@
+{
+  "test-scenarios": [
+    {
+      "id": 1,
+      "name": "Sensor Data API Validation",
+      "description": "Verify that sensor data API endpoints return correct data structures",
+      "category": "api",
+      "status": "passed",
+      "lastRun": "2023-10-15T14:30:00Z",
+      "steps": [
+        { "description": "Send GET request to /api/sensors", "expectedOutcome": "Status 200 with array of sensors" },
+        { "description": "Validate sensor data schema", "expectedOutcome": "All sensors have required fields" }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "MQTT Connection Test",
+      "description": "Verify MQTT broker connection and message publishing",
+      "category": "mqtt",
+      "status": "failed",
+      "lastRun": "2023-10-14T10:15:00Z",
+      "steps": [
+        { "description": "Connect to MQTT broker", "expectedOutcome": "Connection established" },
+        { "description": "Subscribe to test topic", "expectedOutcome": "Subscription successful" },
+        { "description": "Publish message to test topic", "expectedOutcome": "Message received by subscriber" }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Database Query Performance",
+      "description": "Measure response time for complex queries",
+      "category": "database",
+      "status": "pending",
+      "lastRun": null,
+      "steps": [
+        { "description": "Run time-series query on sensor data", "expectedOutcome": "Query completes in < 500ms" },
+        { "description": "Run aggregation query", "expectedOutcome": "Query completes in < 1s" }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "System Health Check",
+      "description": "Verify all system services are running properly",
+      "category": "system",
+      "status": "passed",
+      "lastRun": "2023-10-16T09:15:00Z",
+      "steps": [
+        { "description": "Check API service health", "expectedOutcome": "Service returns 200 OK" },
+        { "description": "Check database connection", "expectedOutcome": "Connection established" },
+        { "description": "Check message broker", "expectedOutcome": "Broker is running" }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "End-to-End Data Flow",
+      "description": "Test complete data flow from sensor to dashboard",
+      "category": "e2e",
+      "status": "pending",
+      "lastRun": null,
+      "steps": [
+        { "description": "Simulate sensor data input", "expectedOutcome": "Data received by ingestion service" },
+        { "description": "Verify data processing", "expectedOutcome": "Data processed and stored in database" },
+        { "description": "Check dashboard visualization", "expectedOutcome": "Data correctly displayed on dashboard" }
+      ]
+    }
+  ],
+  "api-tests": [
+    {
+      "id": 1,
+      "name": "GET /api/sensors",
+      "method": "GET",
+      "endpoint": "/api/sensors",
+      "headers": {},
+      "body": null,
+      "expectedStatus": 200,
+      "expectedResponseSchema": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "string" },
+            "type": { "type": "string" },
+            "location": { "type": "object" },
+            "status": { "type": "string" }
+          }
+        }
+      },
+      "lastRun": "2023-10-15T14:30:00Z",
+      "status": "passed"
+    },
+    {
+      "id": 2,
+      "name": "POST /api/sensors/data",
+      "method": "POST",
+      "endpoint": "/api/sensors/data",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "sensorId": "sensor-123",
+        "value": 25.4,
+        "timestamp": "2023-10-15T14:30:00Z"
+      },
+      "expectedStatus": 201,
+      "expectedResponseSchema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "success": { "type": "boolean" }
+        }
+      },
+      "lastRun": "2023-10-15T15:30:00Z",
+      "status": "failed"
+    }
+  ],
+  "system-metrics": {
+    "cpu": {
+      "usage": 35,
+      "cores": 8,
+      "temperature": 45
+    },
+    "memory": {
+      "total": 16384,
+      "used": 8192,
+      "free": 8192
+    },
+    "disk": {
+      "total": 512000,
+      "used": 256000,
+      "free": 256000
+    },
+    "services": [
+      {
+        "name": "API Service",
+        "status": "running",
+        "uptime": "5d 12h 30m",
+        "memory": 512,
+        "cpu": 5.2
+      },
+      {
+        "name": "Database",
+        "status": "running",
+        "uptime": "10d 8h 15m",
+        "memory": 1024,
+        "cpu": 12.5
+      },
+      {
+        "name": "MQTT Broker",
+        "status": "running",
+        "uptime": "5d 12h 30m",
+        "memory": 256,
+        "cpu": 3.1
+      },
+      {
+        "name": "Data Processing",
+        "status": "running",
+        "uptime": "2d 18h 45m",
+        "memory": 768,
+        "cpu": 8.7
+      }
+    ],
+    "lastUpdate": "2023-10-16T10:30:00Z"
+  }
+}

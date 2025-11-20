@@ -1,0 +1,110 @@
+@startuml
+title City-Scale Digital Twin: Level 1 DFD (Process Decomposition)
+
+skinparam actor {
+  FontSize 12
+  BorderColor #C2185B
+  BackgroundColor #FCE4EC
+  FontColor #880E4F
+}
+
+skinparam rectangle {
+  BorderColor #1565C0
+  BorderThickness 2
+  FontSize 13
+  BackgroundColor #BBDEFB
+  FontColor #0D47A1
+}
+
+skinparam database {
+  BorderColor #E65100
+  BackgroundColor #FFE0B2
+  FontSize 12
+  FontColor #BF360C
+  BorderThickness 2
+}
+
+' External Actors
+actor "IoT Sensors &\nSimulator" as Sensors
+actor "City Managers" as Manager
+actor "QA Engineers" as QA
+actor "DevOps\nEngineers" as DevOps
+
+' Main Processes
+rectangle "1.0 Data Ingestion\n& Validation" as P1 {
+    (1.1 Receive Data\nfrom Sensors) as P1_1
+}
+rectangle "2.0 Data Processing\n& Storage" as P2 {
+    (2.1 Process Sensor Data) as P2_1
+    (2.2 Persist to Database) as P2_2
+}
+rectangle "3.0 Data Retrieval\n& API" as P3 {
+    (3.1 Query Database) as P3_1
+    (3.2 Serve API Requests) as P3_2
+}
+rectangle "4.0 Visualization\n& Analytics" as P4 {
+    (4.1 Generate Dashboards) as P4_1
+    (4.2 Compute Analytics) as P4_2
+}
+rectangle "5.0 Testing &\nMonitoring" as P5 {
+    (5.1 Run Tests) as P5_1
+    (5.2 Collect Metrics) as P5_2
+}
+
+' Data Stores
+database "D1: Raw Sensor Data\n(PostgreSQL)" as D1
+database "D2: Processed Data\nCache (Redis/In-Memory)" as D2
+database "D3: Test Results\n& Logs" as D3
+database "D4: System Metrics\n& Performance" as D4
+
+' Data Flows - Ingestion
+Sensors -->|Real-time Sensor Data| P1_1
+P1_1 -->|Validated Data| P2_1
+
+' Data Flows - Processing
+P2_1 -->|Normalize Data| P2_2
+P2_2 -->|Store Sensor Data| D1
+
+' Data Flows - Retrieval & API
+P3_2 <-->|HTTP/REST| Manager
+P3_2 <-->|HTTP/REST| QA
+P3_2 <-->|HTTP/REST| DevOps
+
+P3_1 -->|Query| D1
+D1 -->|Retrieve Data| P3_1
+
+' Data Flows - Visualization
+P3_2 -->|Sensor Data| P4_1
+P3_2 -->|Analytics Request| P4_2
+P4_2 -->|Compute Trends| D2
+Manager <-->|Visualized Data| P4_1
+Manager <-->|Analytics Report| P4_2
+
+' Data Flows - Testing & Monitoring
+P5_1 -->|API Test Requests| P3_2
+P5_1 -->|Store Results| D3
+P5_2 -->|Collect System Metrics| D4
+P3_2 -->|Performance Data| P5_2
+QA <-->|Test Reports| P5_1
+DevOps <-->|Performance Alerts| P5_2
+DevOps <-->|System Status| D4
+
+' Data Flow - Cross-Process
+P1_1 -->|Quality Metrics| P5_2
+P2_2 -->|Store Performance| D4
+
+note bottom of D1
+  Contains 12 sensor tables:
+  traffic, air_quality, noise, weather,
+  smart_meters, waste_bins, parking,
+  street_lights, public_transport,
+  surveillance, water_quality, energy_grid
+end note
+
+note right of P3_2
+  Core API Interface
+  Handles all external requests
+  Manages rate limiting & auth
+end note
+
+@enduml

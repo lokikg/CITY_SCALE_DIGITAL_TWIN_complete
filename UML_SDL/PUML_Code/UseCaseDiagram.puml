@@ -1,0 +1,124 @@
+@startuml
+title City-Scale Digital Twin: Use Case Diagram
+
+left to right direction
+skinparam actor {
+  BorderColor #C2185B
+  BackgroundColor #FCE4EC
+  FontSize 14
+  FontColor #880E4F
+}
+skinparam usecase {
+  BorderColor #1976D2
+  BackgroundColor #E3F2FD
+  FontSize 13
+  FontColor #0D47A1
+  BorderThickness 2
+}
+
+skinparam rectangle {
+    BackgroundColor #F3E5F5
+    BorderColor #7B1FA2
+    BorderThickness 2
+}
+
+actor "City Manager\n& Planner" as Manager
+actor "QA Engineer" as QA
+actor "DevOps\nEngineer" as DevOps
+actor "System\nAdministrator" as Admin
+actor "IoT Sensors\n& Simulator" as Sensor
+
+rectangle "City-Scale Digital Twin IoT Platform" {
+    ' Manager Use Cases
+    usecase "View Real-Time\nSensor Data" as ViewData
+    usecase "Analyze Historical\nData & Trends" as AnalyzeData
+    usecase "Manage Devices\n(CRUD)" as ManageDevices
+    usecase "Receive Alerts &\nNotifications" as GetAlerts
+    usecase "Visualize Data\non Interactive Map" as VisualizeData
+    usecase "Export Reports\n(CSV, PDF)" as ExportReports
+    
+    ' Sensor Use Cases
+    usecase "Stream Real-Time\nData via MQTT" as StreamData
+    usecase "Publish to\nMQTT Broker" as PublishData
+    
+    ' QA Use Cases
+    usecase "Run Automated\nTests" as RunTests
+    usecase "Perform Load\nTesting" as LoadTest
+    usecase "Execute Integration\nTests" as IntegrationTest
+    usecase "Generate Test\nReports" as TestReports
+    
+    ' DevOps Use Cases
+    usecase "Monitor System\nHealth" as MonitorHealth
+    usecase "View Performance\nMetrics" as ViewMetrics
+    usecase "Configure Alerts\n& Thresholds" as ConfigAlerts
+    usecase "Manage Deployments" as ManageDeploy
+    
+    ' Admin Use Cases
+    usecase "Manage User\nAccounts & Access" as ManageUsers
+    usecase "Configure System\nSettings" as ConfigSystem
+    usecase "View Audit Logs" as ViewLogs
+}
+
+' Manager Relationships
+Manager --|> ViewData
+Manager --|> AnalyzeData
+Manager --|> ManageDevices
+Manager --|> GetAlerts
+Manager --|> VisualizeData
+Manager --|> ExportReports
+
+' Sensor Relationships
+Sensor --|> StreamData
+Sensor --|> PublishData
+
+' QA Relationships
+QA --|> RunTests
+QA --|> LoadTest
+QA --|> IntegrationTest
+QA --|> TestReports
+
+' DevOps Relationships
+DevOps --|> MonitorHealth
+DevOps --|> ViewMetrics
+DevOps --|> ConfigAlerts
+DevOps --|> ManageDeploy
+
+' Admin Relationships
+Admin --|> ManageUsers
+Admin --|> ConfigSystem
+Admin --|> ViewLogs
+
+' Include Relationships (dependencies)
+StreamData .> ViewData : <<includes>>
+StreamData .> AnalyzeData : <<includes>>
+PublishData .> ViewData : <<includes>>
+
+ViewData .> VisualizeData : <<includes>>
+AnalyzeData .> ExportReports : <<includes>>
+ManageDevices .> ViewData : <<includes>>
+
+RunTests .> ViewData : <<includes>>
+LoadTest .> ViewMetrics : <<includes>>
+
+MonitorHealth .> ViewMetrics : <<includes>>
+GetAlerts .> ConfigAlerts : <<extends>>
+
+note bottom of StreamData
+  Continuous real-time data
+  streaming to MQTT broker
+  independent of UI interactions
+end note
+
+note bottom of ViewData
+  Core functionality:
+  displays latest sensor readings
+  from all 12 sensor types
+end note
+
+note bottom of RunTests
+  Includes API, database,
+  MQTT, and E2E testing
+  scenarios
+end note
+
+@enduml

@@ -1,0 +1,33 @@
+/* Theme - Color Schemes */
+:root {
+  --color-primary-500: #3B82F6;
+  --color-primary-600: #2563EB;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-primary-500: #60A5FA;
+    --color-primary-600: #3B82F6;
+  }
+}
+
+/* Accessibility Features */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+*:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+  * {
+    background: white !important;
+    color: black !important;
+  }
+}

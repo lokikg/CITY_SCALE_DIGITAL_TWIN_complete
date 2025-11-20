@@ -1,0 +1,142 @@
+@startuml
+title City-Scale Digital Twin: Detailed Component Architecture
+
+skinparam component {
+    BackgroundColor #E8F5E9
+    BorderColor #2E7D32
+    ArrowColor #558B2F
+    FontSize 12
+    FontColor #1B5E20
+    StereotypeFontSize 10
+}
+
+skinparam rectangle {
+    BackgroundColor #F3E5F5
+    BorderColor #6A1B9A
+    BorderThickness 2
+}
+
+skinparam database {
+    BackgroundColor #FFF3E0
+    BorderColor #E65100
+}
+
+skinparam cloud {
+    BackgroundColor #E0F2F1
+    BorderColor #00695C
+}
+
+' Presentation Layer
+rectangle "Presentation Layer (Vercel)" as presentation {
+  component "React Application" as react_app
+  component "Dashboard UI\n(Leaflet Map)" as dashboard
+  component "Analytics Module\n(Recharts)" as analytics
+  component "Device Management\n(CRUD UI)" as device_mgmt
+  component "Testing UI\n(Test Runner)" as testing_ui
+  component "Navbar & Routing" as navbar
+  component "API Service Layer\n(Axios)" as api_service
+  component "UI Component Library\n(Tailwind CSS)" as ui_lib
+
+  react_app --> dashboard
+  react_app --> analytics
+  react_app --> device_mgmt
+  react_app --> testing_ui
+  react_app --> navbar
+  react_app --> ui_lib
+  dashboard --> api_service
+  analytics --> api_service
+  device_mgmt --> api_service
+  testing_ui --> api_service
+}
+
+' Application Layer - Backend
+rectangle "Application Layer (Render)" as backend {
+  component "FastAPI Application\n(Main App)" as fastapi_app
+  component "API Router\n(/api endpoints)" as api_router
+  component "Simulator Router\n(/simulator)" as sim_router
+  component "Test Runner Router\n(/tests)" as test_router
+  component "MQTT Subscriber\n(Real-time Ingestion)" as mqtt_sub
+  
+  component "Data Validation\n(Pydantic Schemas)" as pydantic
+  component "ORM Layer\n(SQLAlchemy)" as orm_layer
+  component "Database Manager\n(Connection Pool)" as db_manager
+  
+  fastapi_app --> api_router
+  fastapi_app --> sim_router
+  fastapi_app --> test_router
+  fastapi_app --> mqtt_sub
+  
+  api_router --> pydantic
+  sim_router --> pydantic
+  mqtt_sub --> pydantic
+  
+  api_router --> orm_layer
+  sim_router --> orm_layer
+  mqtt_sub --> orm_layer
+  orm_layer --> db_manager
+}
+
+' Data Layer
+rectangle "Data Layer" as data_layer {
+  database "Neon PostgreSQL\n(Production)" as db_postgres
+  database "MongoDB\n(Development)" as db_mongo
+  component "12 Sensor Tables\n(Partitioned by Type)" as sensor_tables
+  component "ORM Models\n(sensor_models.py)" as orm_models
+  
+  db_postgres --|> sensor_tables
+  orm_models --> db_postgres
+  orm_models --> db_mongo
+}
+
+' External Services & Simulation
+rectangle "Messaging & Simulation" as messaging {
+  component "Data Simulator Service\n(Background Worker)" as simulator
+  component "CSV Data Generator\n(Realistic Simulation)" as csv_gen
+  cloud "HiveMQ Cloud\n(MQTT Broker)" as mqtt_broker
+}
+
+' Monitoring & Testing
+rectangle "Monitoring & Analytics" as monitoring {
+  component "Grafana Dashboards\n(Visualization)" as grafana
+  component "Mock API Server\n(Testing)" as mock_api
+  component "Locust Load Tester" as locust
+}
+
+' Data Flow: Frontend to Backend
+api_service -->|REST API Calls| api_router
+api_service -->|Simulator Control| sim_router
+api_service -->|Test Execution| test_router
+
+' Data Flow: Backend to Database
+api_router --> db_manager
+sim_router --> db_manager
+mqtt_sub --> db_manager
+db_manager --> orm_models
+
+' Data Flow: Simulator to MQTT
+simulator --> csv_gen
+simulator -->|MQTT Publish| mqtt_broker
+
+' Data Flow: MQTT to Backend
+mqtt_broker -->|Subscribe| mqtt_sub
+mqtt_sub --> db_manager
+
+' Data Flow: Monitoring
+db_manager -->|Query Data| grafana
+grafana --> testing_ui
+orm_models -->|Reads DB| grafana
+
+' Testing Flow
+mock_api --> testing_ui
+locust -->|Load Test| api_router
+
+note as n1
+  This component diagram shows the detailed
+  interactions between all major components,
+  excluding Prometheus (using Grafana directly on PostgreSQL)
+end note
+
+@enduml
+n1 .. monitoring
+
+@enduml

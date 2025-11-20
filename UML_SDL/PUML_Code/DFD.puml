@@ -1,0 +1,50 @@
+@startuml
+title City-Scale Digital Twin: Level 0 DFD (Context Diagram)
+
+skinparam actor {
+  FontSize 12
+  BorderColor #C2185B
+  BackgroundColor #FCE4EC
+  FontColor #880E4F
+}
+
+skinparam rectangle {
+  BorderColor #1565C0
+  BorderThickness 2
+  FontSize 14
+  BackgroundColor #BBDEFB
+  FontColor #0D47A1
+}
+
+actor "IoT Sensors &\nSimulator" as Sensors
+actor "City Managers &\nPlanners" as CityAdmin
+actor "QA Engineers" as QA
+actor "DevOps\nEngineers" as DevOps
+actor "System\nAdministrators" as Admins
+
+rectangle "City-Scale Digital Twin\nIoT Platform" as System
+
+' Data Flows
+Sensors -->|Real-time Sensor Data\n(MQTT)| System : "IoT Data Stream"
+System -->|City Insights\nAlerts & Reports| CityAdmin : "Actionable Intelligence"
+CityAdmin -->|User Commands\nQueries & Configurations| System : "User Requests"
+
+System -->|Test Commands\nTest Execution| QA : "Testing Interface"
+QA -->|Test Reports\nResults & Logs| System : "Test Feedback"
+
+System -->|Performance Metrics\nHealth Status| DevOps : "Monitoring Data"
+DevOps -->|Optimization Requests\nConfiguration Changes| System : "DevOps Commands"
+
+System -->|System Status\nAudit Logs| Admins : "Administration Data"
+Admins -->|Access Control\nSecurity Policies| System : "Admin Commands"
+
+note right of System
+  Centralized IoT Data Platform
+  - Real-time data ingestion from 12 sensor types
+  - REST API for data retrieval and management
+  - Web UI for visualization and analytics
+  - Testing and monitoring capabilities
+  - Multi-user support with role-based access
+end note
+
+@enduml

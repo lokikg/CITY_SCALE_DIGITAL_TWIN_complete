@@ -1,0 +1,38 @@
+apiVersion: 1
+
+datasources:
+  - name: City Digital Twin API
+    type: simplejson
+    access: proxy
+    url: ${API_URL}/api
+    isDefault: true
+    jsonData:
+      httpMethod: GET
+      timeout: 30
+    secureJsonData: {}
+    
+  - name: PostgreSQL
+    type: postgres
+    access: proxy
+    url: ${POSTGRES_HOST}:5432
+    user: ${POSTGRES_USER}
+    database: ${POSTGRES_DB}
+    isDefault: false
+    jsonData:
+      sslmode: require
+      maxOpenConns: 100
+      maxIdleConns: 100
+      connMaxLifetime: 14400
+      postgresVersion: 1400
+      timescaledb: false
+    secureJsonData:
+      password: ${POSTGRES_PASSWORD}
+    
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: false
+    jsonData:
+      httpMethod: GET
+      timeout: 30

@@ -1,0 +1,153 @@
+@startuml
+title City-Scale Digital Twin: IoT Sensor Class Hierarchy
+
+hide circle
+skinparam class {
+    BackgroundColor #E1F5FE
+    ArrowColor #01579B
+    BorderColor #01579B
+    FontSize 14
+    FontColor #01579B
+    AttributeBackgroundColor #B3E5FC
+}
+
+skinparam abstract {
+    BackgroundColor #FFF3E0
+    BorderColor #E65100
+    FontColor #E65100
+}
+
+' Base Abstract Class
+abstract class BaseSensorData {
+    # id: VARCHAR (UUID, PK)
+    # location: VARCHAR
+    # latitude: FLOAT
+    # longitude: FLOAT
+    # timestamp: TIMESTAMP
+    ---
+    + get_location(): str
+    + validate_coordinates(): bool
+    + to_json(): dict
+}
+
+' Sensor Type 1: Traffic
+class TrafficSensor {
+    + vehicle_count: INTEGER
+    + avg_speed: FLOAT
+}
+
+' Sensor Type 2: Air Quality
+class AirQualitySensor {
+    + pm25: FLOAT
+    + pm10: FLOAT
+    + no2: FLOAT
+    + co: FLOAT
+}
+
+' Sensor Type 3: Noise
+class NoiseSensor {
+    + decibel_level: FLOAT
+}
+
+' Sensor Type 4: Weather
+class WeatherStation {
+    + temperature: FLOAT
+    + humidity: FLOAT
+    + rainfall: FLOAT
+    + wind_speed: FLOAT
+}
+
+' Sensor Type 5: Smart Meter
+class SmartMeter {
+    + electricity_usage: FLOAT
+    + water_usage: FLOAT
+}
+
+' Sensor Type 6: Waste Bin
+class WasteBin {
+    + fill_level: FLOAT
+    + temperature: FLOAT
+}
+
+' Sensor Type 7: Parking
+class ParkingSensor {
+    + is_occupied: BOOLEAN
+}
+
+' Sensor Type 8: Street Light
+class StreetLight {
+    + status: BOOLEAN
+    + energy_consumption: FLOAT
+}
+
+' Sensor Type 9: Public Transport
+class PublicTransportTracker {
+    + bus_id: VARCHAR
+    + occupancy: INTEGER
+}
+
+' Sensor Type 10: Surveillance Camera
+class SurveillanceCamera {
+    + motion_detected: BOOLEAN
+    + object_count: INTEGER
+}
+
+' Sensor Type 11: Water Quality
+class WaterQualitySensor {
+    + ph: FLOAT
+    + turbidity: FLOAT
+    + dissolved_oxygen: FLOAT
+}
+
+' Sensor Type 12: Energy Grid
+class EnergyGridSensor {
+    + voltage: FLOAT
+    + current: FLOAT
+    + frequency: FLOAT
+}
+
+' Inheritance Relationships
+BaseSensorData <|-- TrafficSensor
+BaseSensorData <|-- AirQualitySensor
+BaseSensorData <|-- NoiseSensor
+BaseSensorData <|-- WeatherStation
+BaseSensorData <|-- SmartMeter
+BaseSensorData <|-- WasteBin
+BaseSensorData <|-- ParkingSensor
+BaseSensorData <|-- StreetLight
+BaseSensorData <|-- PublicTransportTracker
+BaseSensorData <|-- SurveillanceCamera
+BaseSensorData <|-- WaterQualitySensor
+BaseSensorData <|-- EnergyGridSensor
+
+note bottom of BaseSensorData
+    All 12 sensor tables inherit from BaseSensorData
+    Each table is independent with no foreign key relationships
+    Common timestamp-based indexing for queries
+    Supports both PostgreSQL (production) and MongoDB (development)
+end note
+
+note right of TrafficSensor
+    Table: traffic_sensors
+    Usage: Traffic flow monitoring
+end note
+
+note right of AirQualitySensor
+    Table: air_quality_sensors
+    Usage: Urban air quality tracking
+end note
+
+note right of WeatherStation
+    Table: weather_stations
+    Usage: Meteorological data collection
+end note
+
+note right of EnergyGridSensor
+    Table: energy_grid_sensors
+    Usage: Smart grid monitoring
+end note
+
+@enduml
+end note
+
+@enduml

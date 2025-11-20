@@ -1,0 +1,121 @@
+@startuml
+title City-Scale Digital Twin: System Module Architecture
+
+skinparam package {
+    BackgroundColor #E3F2FD
+    BorderColor #1976D2
+    FontColor #0D47A1
+}
+
+skinparam component {
+    BackgroundColor #C8E6C9
+    BorderColor #2E7D32
+    FontColor #1B5E20
+}
+
+skinparam database {
+    BackgroundColor #FFE0B2
+    BorderColor #E65100
+    FontColor #BF360C
+}
+
+skinparam node {
+    BackgroundColor #F8BBD0
+    BorderColor #C2185B
+    FontColor #880E4F
+}
+
+skinparam note {
+    BackgroundColor #FFF9C4
+    BorderColor #F57F17
+    FontColor #F57F17
+}
+
+' Presentation Layer Modules
+package "Frontend Module" as frontend {
+    [Dashboard Component]\nas dash_comp
+    [Analytics Module]\nas analytics_comp
+    [Device Management]\nas device_comp
+    [Alert System]\nas alert_comp
+    [API Service Layer]\nas api_layer
+    [UI Component Library]\nas ui_lib
+}
+
+' Application Layer Modules
+package "Backend Module" as backend {
+    [FastAPI Main App]\nas fastapi
+    [API Routing]\nas api_routes
+    [Data Simulator]\nas simulator
+    [Test Runner]\nas test_runner
+    [MQTT Subscriber]\nas mqtt_sub
+    [Data Validation]\nas validation
+    [ORM Layer]\nas orm_layer
+    [Database Manager]\nas db_mgr
+}
+
+' Data Layer Modules
+package "Data Module" as data {
+    database "PostgreSQL"
+    database "MongoDB (Dev)"
+    [Sensor Models]\nas sensor_models
+    [Query Builder]\nas query_builder
+}
+
+' External Services
+package "External Services" as external {
+    node "MQTT Broker\n(HiveMQ Cloud)"
+    node "Data Simulator\nService"
+    node "Grafana\nMonitoring"
+}
+
+' Component Interactions
+dash_comp --> api_layer
+analytics_comp --> api_layer
+device_comp --> api_layer
+alert_comp --> api_layer
+api_layer --> api_routes
+
+api_routes --> validation
+simulator --> validation
+mqtt_sub --> validation
+
+validation --> orm_layer
+orm_layer --> db_mgr
+db_mgr --> PostgreSQL
+db_mgr --> "MongoDB (Dev)"
+
+simulator --> "Data Simulator\nService"
+"Data Simulator\nService" --> "MQTT Broker\n(HiveMQ Cloud)"
+"MQTT Broker\n(HiveMQ Cloud)" --> mqtt_sub
+
+test_runner --> api_routes
+db_mgr --> sensor_models
+db_mgr --> query_builder
+
+"Grafana\nMonitoring" --> PostgreSQL
+
+' Module Notes
+note right of frontend
+  Client-facing modules
+  React + Tailwind CSS
+  Deployed on Vercel
+end note
+
+note right of backend
+  Business logic modules
+  FastAPI + async/await
+  Deployed on Render
+end note
+
+note right of data
+  Data persistence modules
+  12 sensor tables
+  Support dual DB systems
+end note
+
+note bottom of external
+  Third-party cloud services
+  and monitoring tools
+end note
+
+@enduml

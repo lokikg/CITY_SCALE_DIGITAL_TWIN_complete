@@ -1,0 +1,174 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "City Digital Twin - Air Quality Index",
+    "tags": ["city", "iot", "air-quality", "aqi"],
+    "style": "dark",
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Air Quality Index (AQI)",
+        "type": "gauge",
+        "targets": [
+          {
+            "target": "grafana/air_quality_metrics",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "yellow",
+                  "value": 51
+                },
+                {
+                  "color": "orange",
+                  "value": 101
+                },
+                {
+                  "color": "red",
+                  "value": 151
+                }
+              ]
+            },
+            "unit": "short",
+            "min": 0,
+            "max": 200
+          }
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "id": 2,
+        "title": "PM2.5 Levels",
+        "type": "timeseries",
+        "targets": [
+          {
+            "target": "grafana/air_quality_metrics",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "unit": "conμgm3"
+          }
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 9,
+          "x": 6,
+          "y": 0
+        }
+      },
+      {
+        "id": 3,
+        "title": "PM10 Levels",
+        "type": "timeseries",
+        "targets": [
+          {
+            "target": "grafana/air_quality_metrics",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "unit": "conμgm3"
+          }
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 9,
+          "x": 15,
+          "y": 0
+        }
+      },
+      {
+        "id": 4,
+        "title": "Pollutant Levels by Location",
+        "type": "barchart",
+        "targets": [
+          {
+            "target": "grafana/air_quality_metrics",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 10,
+          "w": 12,
+          "x": 0,
+          "y": 8
+        },
+        "options": {
+          "orientation": "horizontal",
+          "groupWidth": 0.7,
+          "barWidth": 0.97,
+          "showValue": "auto",
+          "stacking": "none",
+          "legend": {
+            "displayMode": "visible",
+            "placement": "bottom"
+          },
+          "tooltip": {
+            "mode": "single"
+          }
+        }
+      },
+      {
+        "id": 5,
+        "title": "Air Quality Status by Location",
+        "type": "table",
+        "targets": [
+          {
+            "target": "grafana/air_quality_metrics",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 10,
+          "w": 12,
+          "x": 12,
+          "y": 8
+        },
+        "options": {
+          "showHeader": true,
+          "sortBy": [
+            {
+              "desc": true,
+              "displayName": "AQI Value"
+            }
+          ]
+        }
+      }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "refresh": "30s",
+    "schemaVersion": 27,
+    "version": 1
+  }
+}

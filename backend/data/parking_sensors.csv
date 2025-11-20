@@ -1,0 +1,26 @@
+id,location,is_occupied,timestamp,latitude,longitude
+1,Times Square Parking Garage,True,2025-11-20T13:11:59.858572Z,40.757,-73.9855
+2,Port Authority Bus Terminal Garage,True,2025-11-20T13:11:59.858747Z,40.7569,-73.9903
+3,Madison Square Garden Parking,True,2025-11-20T13:11:59.857806Z,40.7505,-73.9934
+4,Battery Park Garage,True,2025-11-20T13:11:59.857913Z,40.7033,-74.017
+5,Central Park West Parking,False,2025-11-20T13:11:06.688389Z,40.7813,-73.9735
+6,Lincoln Center Garage,False,2025-11-20T13:10:29.333184Z,40.7725,-73.9835
+7,South Street Seaport Parking,False,2025-11-20T13:11:29.612131Z,40.7075,-74.0033
+8,Hudson Yards Garage,False,2025-11-20T13:10:36.440891Z,40.754,-74.0027
+9,Penn Station Parking,True,2025-11-20T13:11:29.612808Z,40.7506,-73.9935
+10,Rockefeller Center Garage,False,2025-11-20T13:11:59.858114Z,40.7587,-73.9787
+11,Grand Central Terminal Parking,False,2025-11-20T13:11:59.858659Z,40.7527,-73.9772
+12,Chelsea Market Garage,False,2025-11-20T13:11:59.858016Z,40.7423,-74.006
+13,World Trade Center Parking,False,2025-11-20T13:11:59.858479Z,40.7118,-74.0131
+14,Union Square Garage,True,2025-11-20T13:11:29.612568Z,40.7359,-73.9911
+15,Columbus Circle Parking,False,2025-11-20T13:11:29.612689Z,40.7681,-73.9819
+16,Chinatown Parking,False,2025-11-20T13:11:59.858385Z,40.7158,-73.997
+17,SoHo Street Parking,False,2025-11-20T13:11:59.858297Z,40.7233,-74.002
+18,Wall Street Garage,True,2025-11-20T13:11:59.859027Z,40.7075,-74.0113
+19,Herald Square Parking,False,2025-11-20T13:11:59.859120Z,40.7496,-73.987
+20,Bryant Park Garage,False,2025-11-20T13:07:28.147146Z,40.7536,-73.9832
+21,Washington Square Parking,True,2025-11-20T13:11:59.858853Z,40.7308,-73.9973
+22,East Village Parking,False,2025-11-20T13:11:59.857675Z,40.7265,-73.9815
+23,Harlem 125th Street Garage,False,2025-11-20T13:11:59.858207Z,40.8075,-73.945
+24,Yankee Stadium Parking,True,2025-11-20T13:11:29.612431Z,40.8296,-73.9262
+25,Brooklyn Bridge Entrance Parking,True,2025-11-20T13:11:59.858941Z,40.7061,-73.9969

@@ -1,0 +1,84 @@
+@startuml
+title City-Scale Digital Twin: Data Flow Activity Diagram
+
+skinparam {
+  FontSize 14
+  FontName Arial
+  ArrowColor #2E7D32
+  ActivityBorderColor #1B5E20
+  ActivityBackgroundColor #C8E6C9
+  ActivityFontColor #1B5E20
+  NoteBorderColor #FF6F00
+  NoteBackgroundColor #FFE0B2
+  NoteFontColor #E65100
+  PartitionBorderColor #0277BD
+  PartitionBackgroundColor #B3E5FC
+  PartitionFontColor #01579B
+}
+
+start
+:Initialize System;
+note right
+  FastAPI backend starts
+  MQTT subscriber connects
+  Database connections pooled
+end note
+
+fork
+  partition "Background: Data Simulation" {
+    :Generate Realistic\nSensor Data;
+    note right
+      Each sensor type uses
+      domain-specific algorithms
+    end note
+    :Publish to MQTT\nBroker;
+    :Update CSV Cache;
+    :Repeat every 30s;
+  }
+fork again
+  partition "Background: MQTT Ingestion" {
+    :Subscribe to\nMQTT Topics;
+    :Receive Message\nfrom Broker;
+    :Validate Data\n(Pydantic);
+    :Async Write to\nPostgreSQL;
+    :Log Transaction;
+  }
+fork again
+  partition "Frontend: User Interaction" {
+    :User Opens\nDashboard;
+    :React App Loads;
+    :Make API Request\nto Backend;
+  }
+end fork
+
+:Backend Receives\nREST Request;
+:Query ORM Models;
+:Execute SQL Query\non Database;
+:Get Sensor Data;
+
+:Format Response\nto JSON;
+:Send to Frontend\n(HTTP 200);
+
+:Frontend Receives\nResponse;
+:Parse JSON Data;
+:Update React State;
+:Render Interactive\nMap with Leaflet;
+
+:Display Real-Time\nDashboard;
+:Show Analytics\nCharts;
+
+partition "Monitoring & Testing" {
+  :Test Runner\nExecutes Tests;
+  :Query Results\nfrom DB;
+  :Aggregate Metrics;
+  :Store in Test Logs;
+}
+
+:Grafana Queries\nDatabase;
+:Generate Dashboards;
+:Display System\nHealth Status;
+
+:Final Visualization\nState;
+stop
+
+@enduml

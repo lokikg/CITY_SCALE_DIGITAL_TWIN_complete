@@ -1,0 +1,137 @@
+@startuml
+title City-Scale Digital Twin: Layered System Architecture
+
+skinparam component {
+    BackgroundColor #E3F2FD
+    BorderColor #1976D2
+    ArrowColor #1565C0
+    FontColor #0D47A1
+    BorderThickness 2
+}
+
+skinparam cloud {
+    BackgroundColor #C8E6C9
+    BorderColor #2E7D32
+    FontColor #1B5E20
+}
+
+skinparam database {
+    BackgroundColor #FFE0B2
+    BorderColor #E65100
+    FontColor #BF360C
+    BorderThickness 2
+}
+
+skinparam rectangle {
+    BackgroundColor #F3E5F5
+    BorderColor #7B1FA2
+    BorderThickness 2
+}
+
+skinparam actor {
+    BackgroundColor #FCE4EC
+    BorderColor #C2185B
+    FontColor #880E4F
+}
+
+' External Actors
+actor "IoT Sensors / Simulator" as Sensors
+
+' Presentation Layer
+rectangle "Presentation Layer" as PresentationLayer #E3F2FD {
+    component "React App\n(Vercel)" as Frontend
+    component "Dashboard\n(React, Leaflet)" as Dashboard
+    component "Analytics Module\n(React, Recharts)" as Analytics
+    component "Device Management UI\n(React, CRUD)" as DeviceMgmt
+    component "API Service\n(Axios)" as ApiService
+    component "Testing UI\n(React, Mock API)" as TestingUI
+    
+    Frontend --|> Dashboard
+    Frontend --|> Analytics
+    Frontend --|> DeviceMgmt
+    Frontend --|> TestingUI
+    Dashboard --> ApiService
+    Analytics --> ApiService
+    DeviceMgmt --> ApiService
+}
+
+' Application Layer
+rectangle "Application Layer" as ApplicationLayer #FFF9C4 {
+    component "FastAPI Application\n(Render)" as FastAPI
+    component "API Router\n(REST Endpoints)" as ApiRouter
+    component "Data Simulator Service\n(Background Worker)" as Simulator
+    component "Test Runner API" as TestRunner
+    component "MQTT Subscriber\n(Real-time Ingestion)" as MqttSub
+    component "Data Validation\n(Pydantic Schemas)" as Validation
+    
+    FastAPI --> ApiRouter
+    FastAPI --> Simulator
+    FastAPI --> TestRunner
+    FastAPI --> MqttSub
+    ApiRouter --> Validation
+    MqttSub --> Validation
+    Simulator --> Validation
+}
+
+' Data Layer
+rectangle "Data Layer" as DataLayer #E8F5E9 {
+    database "Neon PostgreSQL\n(Production)" as PostgreSQL
+    component "SQLAlchemy ORM\nModels" as ORM
+    component "Sensor Tables\n(12 types)" as SensorTables
+    component "MongoDB Driver\n(Async Access)" as MongoDB
+    
+    PostgreSQL --|> SensorTables
+    ORM --> PostgreSQL
+    ORM --> MongoDB
+}
+
+' External Services Layer
+rectangle "External Services" as ExternalServices #FFCCCC {
+    cloud "HiveMQ MQTT Broker\n(Cloud)" as MQTT
+    component "Monitoring & Analytics\n(Grafana)" as Grafana
+}
+
+' Data Flow Connections
+Sensors --> MQTT : MQTT Data
+MQTT --> MqttSub : Subscribe
+MqttSub --> ORM : Write Data
+
+ApiService --> ApiRouter : HTTP/REST Requests
+ApiRouter --> ORM : Query/Write
+ApiRouter --> ApiService : Response
+
+Simulator --> ORM : Generate Data
+Simulator --> MQTT : Publish
+
+TestRunner --> ApiRouter : Test Commands
+
+ORM --> PostgreSQL : Read Sensor Data
+ORM --> ApiService : Dashboard Data
+
+Grafana --> PostgreSQL : Query Metrics
+Grafana --> Frontend : Dashboards
+
+note right of PresentationLayer
+    Client-facing UI layer
+    Built with React + Tailwind CSS
+    Deployed to Vercel
+end note
+
+note right of ApplicationLayer
+    Business logic & data processing
+    FastAPI backend with async/await
+    Deployed to Render
+end note
+
+note right of DataLayer
+    Persistent data storage
+    PostgreSQL (production)
+    MongoDB (development)
+end note
+
+note right of ExternalServices
+    Third-party cloud services
+    Real-time messaging & monitoring
+end note
+
+@enduml

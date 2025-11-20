@@ -1,0 +1,186 @@
+# Combined .gitignore for this project
+
+# ---------- Python ----------
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+
+# Virtual environments
+venv/
+env/
+.venv/
+ENV/
+
+# Unit test / coverage
+.tox/
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# MyPy
+.mypy_cache/
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos.
+*.manifest
+*.spec
+
+# pip
+pip-selfcheck.json
+
+# ---------- Node / frontend ----------
+# Node modules
+node_modules/
+
+# Logs
+/npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build / output
+/.parcel-cache/
+/.next/
+/.nuxt/
+/dist/
+/build/
+
+# Testing
+/coverage/
+
+# ---------- Project-specific build folders ----------
+frontend/build/
+testing-ui/build/
+
+# ---------- IDEs / Editors ----------
+# VS Code
+.vscode/
+
+# JetBrains
+.idea/
+
+# macOS
+.DS_Store
+
+# Editor backups
+*~
+*.swp
+
+# ---------- Environment files ----------
+# Local env vars (may contain secrets)
+.env
+.env.*.local
+.env.local
+
+# ---------- Data and large files (recommended to exclude) ----------
+# The repository contains a `data/` folder with CSVs and sensor datasets.
+# Those files can be large; by default we ignore them here and recommend
+# using an external storage or Git LFS if you need to version them.
+data/*.csv
+data/*.zip
+data/*.tar.gz
+
+# If you actually want to track a small data file, add an allow rule above
+# for that file (for example: !data/keep-me.csv)
+
+# The user indicated the project CSVs are small and should be tracked.
+# Un-ignore CSVs in data/ so they will be committed. If you later have
+# large files, revert this change and use Git LFS or external storage.
+!data/*.csv
+
+# ---------- Misc ----------
+# OS generated files
+Thumbs.db
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# IDE and editors
+.idea/
+.vscode/
+
+# Dependencies
+node_modules/
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# Testing
+/coverage
+
+# Next.js
+/.next/
+/out/
+next-env.d.ts
+*.tsbuildinfo
+
+# Production builds
+/build
+dist/
+dist
+
+# Environment files (comprehensive coverage)
+
+*token.json*
+*credentials.json*
+
+# Logs and debug files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+dump.rdb
+
+# System files
+.DS_Store
+*.pem
+
+# Python
+__pycache__/
+*pyc*
+venv/
+.venv/
+
+# Development tools
+chainlit.md
+.chainlit
+.ipynb_checkpoints/
+.ac
+
+# Deployment
+.vercel
+
+# Data and databases
+agenthub/agents/youtube/db
+
+# Archive files and large assets
+**/*.zip
+**/*.tar.gz
+**/*.tar
+**/*.tgz
+*.pack
+*.deb
+*.dylib
+
+# Build caches
+.cache/
+
+# Mobile development
+android-sdk/ frontend/node_modules/.cache/default-development/2.pack
+frontend/node_modules/.cache/default-development/2.pack

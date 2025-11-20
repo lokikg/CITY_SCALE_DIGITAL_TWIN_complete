@@ -1,0 +1,17 @@
+[Unit]
+Description=City IoT Data Simulator Service
+After=network.target
+
+[Service]
+User=render
+WorkingDirectory=/opt/render/project/src/backend
+ExecStart=/usr/bin/python3 /opt/render/project/src/backend/data_simulator.py
+Restart=always
+RestartSec=10
+Environment=PYTHONUNBUFFERED=1
+Environment=LOG_LEVEL=INFO
+Environment=SIMULATION_INTERVAL_SECONDS=30
+Environment=BACKUP_ENABLED=true
+
+[Install]
+WantedBy=multi-user.target
