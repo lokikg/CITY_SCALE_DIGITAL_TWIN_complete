@@ -714,10 +714,7 @@ Contributions are welcome! Please follow these steps:
 - **JavaScript/React**: Follow Airbnb style guide, use ESLint + Prettier
 - Write tests for new features
 - Update documentation as needed
-
-## 📄 License
-
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+  
 
 ## 👥 Authors
 
